@@ -8,12 +8,13 @@ import {
 } from "firebase/firestore";
 import app from "./firebase";
 import { collection, getDocs } from "firebase/firestore";
+import { TeacherType } from "./data";
 
 const db = getFirestore(app);
 
 export async function getAllData(collectionName: string) {
 	const querySnapshot = await getDocs(collection(db, collectionName));
-	let data = querySnapshot.docs.map((doc) => {
+	let data: TeacherType[] = querySnapshot.docs.map((doc) => {
 		return {
 			id: doc.id,
 			...doc.data(),
@@ -24,7 +25,7 @@ export async function getAllData(collectionName: string) {
 
 export async function getData(collectionName: string, id: string) {
 	const docSnap = await getDoc(doc(db, collectionName, id));
-	const data = {
+	const data: TeacherType = {
 		id: docSnap.id,
 		...docSnap.data(),
 	};

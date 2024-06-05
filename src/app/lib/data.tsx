@@ -38,3 +38,12 @@ export const mataPelajaran = [
 	"Seni Budaya",
 	"Keterampilan",
 ];
+
+export type TeacherType = {
+	id: string;
+	nama?: string;
+	mapel?: string;
+	jabatan?: string;
+	image?: string;
+	date?: string;
+};

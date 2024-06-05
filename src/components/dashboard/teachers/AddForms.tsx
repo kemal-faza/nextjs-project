@@ -3,9 +3,12 @@
 import { useState } from "react";
 import { jabatan, mataPelajaran } from "@/app/lib/data";
 import { addTeacher } from "@/app/lib/action";
+import Image from "next/image";
 
 export default function TeacherAddForms() {
 	const [mapel, setMapel] = useState([""]);
+	const [image, setImage] = useState("");
+	const [createObjectURL, setCreateObjectURL] = useState("");
 
 	function handleMapelChange(value: string) {
 		if (mapel.includes(value)) {
@@ -15,6 +18,14 @@ export default function TeacherAddForms() {
 		} else {
 			setMapel([...mapel, value]);
 		}
+	}
+
+	function handleImageChange(e: any) {
+		const file = e.target.files[0];
+		const urlImage = URL.createObjectURL(file);
+
+		setImage(image);
+		setCreateObjectURL(urlImage);
 	}
 
 	return (
@@ -34,7 +45,6 @@ export default function TeacherAddForms() {
 					id="nama"
 					className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
 					placeholder=""
-					required
 				/>
 				<label
 					htmlFor="nama"
@@ -85,6 +95,39 @@ export default function TeacherAddForms() {
 						</label>
 					</div>
 				))}
+			</div>
+
+			<div className="relative z-0 w-full mb-5 group">
+				<label
+					className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+					htmlFor="image">
+					Foto
+				</label>
+				<div className="flex items-center">
+					<div>
+						<Image
+							src={createObjectURL || "/img/default.jpg"}
+							alt=""
+							width={200}
+							height={200}
+						/>
+					</div>
+					<div className="ml-3">
+						<input
+							className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+							aria-describedby="user_avatar_help"
+							id="image"
+							name="image"
+							type="file"
+							onChange={handleImageChange}
+						/>
+						<div
+							className="mt-1 text-sm text-gray-500 dark:text-gray-300"
+							id="user_avatar_help">
+							kmk
+						</div>
+					</div>
+				</div>
 			</div>
 
 			<button
