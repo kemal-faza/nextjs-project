@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import fs from "fs/promises";
 import { hash, randomUUID } from "crypto";
 import { StudentType, TeacherType, bulan } from "./data";
+import path, { dirname } from "path";
 
 export async function getAllTeachers() {
 	const teachers: TeacherType[] = await getAllData("teachers");
@@ -44,7 +45,10 @@ export async function addTeacher(formData: FormData) {
 		const buffer = await file.arrayBuffer();
 		const imageBuffer = Buffer.from(buffer);
 
-		await fs.writeFile(`public/img/teachers/${data.image}`, imageBuffer);
+		await fs.writeFile(
+			`${process.cwd()}/public/img/teachers/${data.image}`,
+			imageBuffer,
+		);
 	}
 
 	await addData("teachers", data);
@@ -56,7 +60,9 @@ export async function addTeacher(formData: FormData) {
 export async function deleteTeacher(id: string) {
 	const teacher = await getData("teachers", id);
 
-	fs.rm(`public/img/teachers/${teacher.image}.png`, { force: true });
+	fs.rm(`${process.cwd()}/public/img/teachers/${teacher.image}.png`, {
+		force: true,
+	});
 	await deleteData("teachers", id);
 
 	revalidatePath("/dashboard/teachers");
@@ -80,8 +86,13 @@ export async function editTeacher(id: string, formData: FormData) {
 		const buffer = await file.arrayBuffer();
 		const imageBuffer = Buffer.from(buffer);
 
-		await fs.rm(`public/img/teachers/${teacher.image}`, { force: true });
-		await fs.writeFile(`public/img/teachers/${data.image}`, imageBuffer);
+		await fs.rm(`${process.cwd()}/public/img/teachers/${teacher.image}`, {
+			force: true,
+		});
+		await fs.writeFile(
+			`${process.cwd()}/public/img/teachers/${data.image}`,
+			imageBuffer,
+		);
 	}
 
 	await editData("teachers", data, id);
@@ -113,7 +124,10 @@ export async function addStudent(formData: FormData) {
 		const buffer = await file.arrayBuffer();
 		const imageBuffer = Buffer.from(buffer);
 
-		await fs.writeFile(`public/img/students/${data.image}`, imageBuffer);
+		await fs.writeFile(
+			`${process.cwd()}/public/img/students/${data.image}`,
+			imageBuffer,
+		);
 	}
 
 	await addData("students", data);
@@ -125,7 +139,9 @@ export async function addStudent(formData: FormData) {
 export async function deleteStudent(id: string) {
 	const teacher = await getData("students", id);
 
-	fs.rm(`public/img/students/${teacher.image}.png`, { force: true });
+	fs.rm(`${process.cwd()}/public/img/students/${teacher.image}.png`, {
+		force: true,
+	});
 	await deleteData("students", id);
 
 	revalidatePath("/dashboard/students");
@@ -155,10 +171,16 @@ export async function editStudent(id: string, formData: FormData) {
 		const imageBuffer = Buffer.from(buffer);
 
 		if (student.image != "")
-			await fs.rm(`public/img/students/${student.image}`, {
-				force: true,
-			});
-		await fs.writeFile(`public/img/students/${data.image}`, imageBuffer);
+			await fs.rm(
+				`${process.cwd()}/public/img/students/${student.image}`,
+				{
+					force: true,
+				},
+			);
+		await fs.writeFile(
+			`${process.cwd()}/public/img/students/${data.image}`,
+			imageBuffer,
+		);
 	}
 
 	await editData("students", data, id);
