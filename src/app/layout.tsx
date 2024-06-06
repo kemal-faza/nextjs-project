@@ -22,6 +22,7 @@ export default function RootLayout({
 			<body className={inter.className}>
 				{children}
 				<Script src="/script/flowbite.min.js"></Script>
+				<Script src="/script/datepicker.min.js"></Script>
 			</body>
 		</html>
 	);

@@ -14,7 +14,7 @@ const db = getFirestore(app);
 
 export async function getAllData(collectionName: string) {
 	const querySnapshot = await getDocs(collection(db, collectionName));
-	let data: TeacherType[] = querySnapshot.docs.map((doc) => {
+	const data: any[] = querySnapshot.docs.map((doc) => {
 		return {
 			id: doc.id,
 			...doc.data(),
@@ -25,7 +25,7 @@ export async function getAllData(collectionName: string) {
 
 export async function getData(collectionName: string, id: string) {
 	const docSnap = await getDoc(doc(db, collectionName, id));
-	const data: TeacherType = {
+	const data: any = {
 		id: docSnap.id,
 		...docSnap.data(),
 	};

@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { jabatan, mataPelajaran } from "@/app/lib/data";
+import { TeacherType, jabatan, mataPelajaran } from "@/app/lib/data";
 import { addTeacher, editTeacher } from "@/app/lib/action";
-import { TeacherType } from "@/app/dashboard/teachers/page";
+import Image from "next/image";
 
 export default function TeacherEditForms({
 	teacher,
@@ -13,6 +13,8 @@ export default function TeacherEditForms({
 	const [mapelAjar, setMapelAjar] = useState(
 		teacher.mapel?.split(", ") || [""],
 	);
+	const [image, setImage] = useState("");
+	const [createObjectURL, setCreateObjectURL] = useState("");
 
 	function handleMapelChange(value: string) {
 		if (mapelAjar.includes(value)) {
@@ -22,6 +24,14 @@ export default function TeacherEditForms({
 		} else {
 			setMapelAjar([...mapelAjar, value]);
 		}
+	}
+
+	function handleImageChange(e: any) {
+		const file = e.target.files[0];
+		const urlImage = URL.createObjectURL(file);
+
+		setImage(image);
+		setCreateObjectURL(urlImage);
 	}
 
 	const editTeacherWithId = editTeacher.bind(null, teacher.id);
@@ -45,7 +55,6 @@ export default function TeacherEditForms({
 					defaultValue={teacher.nama}
 					className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
 					placeholder=""
-					required
 				/>
 				<label
 					htmlFor="nama"
@@ -64,14 +73,14 @@ export default function TeacherEditForms({
 					id="nama"
 					name="jabatan"
 					className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-					{jabatan.map((jabatan) => (
+					{jabatan.map((item) => (
 						<option
-							key={jabatan}
-							value={jabatan}
-							{...(teacher.jabatan === jabatan && {
+							key={item}
+							value={item}
+							{...(teacher.jabatan === item && {
 								selected: true,
 							})}>
-							{jabatan}
+							{item}
 						</option>
 					))}
 				</select>
@@ -102,6 +111,42 @@ export default function TeacherEditForms({
 						</label>
 					</div>
 				))}
+			</div>
+
+			<div className="relative z-0 w-full mb-5 group">
+				<label
+					className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+					htmlFor="image">
+					Foto
+				</label>
+				<div className="flex items-center">
+					<div>
+						<Image
+							src={
+								createObjectURL ||
+								`/img/teachers/${teacher.image}`
+							}
+							alt={`${teacher.nama}`}
+							width={200}
+							height={200}
+						/>
+					</div>
+					<div className="ml-3">
+						<input
+							className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+							aria-describedby="user_avatar_help"
+							id="image"
+							name="image"
+							type="file"
+							onChange={handleImageChange}
+						/>
+						<div
+							className="mt-1 text-sm text-gray-500 dark:text-gray-300"
+							id="user_avatar_help">
+							kmk
+						</div>
+					</div>
+				</div>
 			</div>
 
 			<button

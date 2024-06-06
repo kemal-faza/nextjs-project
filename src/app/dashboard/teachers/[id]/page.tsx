@@ -1,4 +1,4 @@
-import { getData } from "@/app/lib/db";
+import { getTeacher } from "@/app/lib/action";
 import TeacherEditForms from "@/components/dashboard/teachers/EditForm";
 import { ChevronLeft } from "lucide-react";
 import { Metadata } from "next";
@@ -13,7 +13,7 @@ export default async function EditTeacherPage({
 }: {
 	params: { id: string };
 }) {
-	const teacher = await getData("teachers", id);
+	const teacher = await getTeacher(id);
 	return (
 		<>
 			<div className="flex justify-between mb-5">

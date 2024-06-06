@@ -1,6 +1,6 @@
 "use client";
 import clsx from "clsx";
-import { LayoutDashboard, Users } from "lucide-react";
+import { GraduationCap, LayoutDashboard, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -16,6 +16,11 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
 		{
 			name: "Teachers",
 			link: "/dashboard/teachers",
+			icon: GraduationCap,
+		},
+		{
+			name: "Students",
+			link: "/dashboard/students",
 			icon: Users,
 		},
 	];

@@ -1,10 +1,10 @@
 "use client";
-import { deleteStudent, deleteTeacher } from "@/app/lib/action";
+import { deleteStudent } from "@/app/lib/action";
 import { Trash2 } from "lucide-react";
 import Swal from "sweetalert2";
 
-export default function DeleteTeacherButton({ id }: { id: string }) {
-	const deleteTeacherWithId = deleteTeacher.bind(null, id);
+export async function DeleteStudentButton({ id }: { id: string }) {
+	const deleteStudentWithId = deleteStudent.bind(null, id);
 	function handleClick() {
 		Swal.fire({
 			title: "Hapus data?",
@@ -18,7 +18,7 @@ export default function DeleteTeacherButton({ id }: { id: string }) {
 			focusCancel: true,
 		}).then((result) => {
 			if (result.isConfirmed) {
-				deleteTeacherWithId();
+				deleteStudentWithId();
 				Swal.fire({
 					title: "Dihapus!",
 					text: "Data telah dihapus.",
