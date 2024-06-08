@@ -1,11 +1,13 @@
-import Image from "next/image";
-import Navbar from "@/components/Navbar";
+import { Metadata } from "next";
 
-export default function Home() {
+export const metadata: Metadata = {
+	title: "Dashboard",
+};
+
+export default function DashboardPage() {
 	return (
 		<>
-			<Navbar />
-			<div>Hello</div>
+			<div>Dashboard</div>
 		</>
 	);
 }

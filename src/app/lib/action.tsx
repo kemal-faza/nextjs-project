@@ -1,11 +1,25 @@
 "use server";
-import { addData, deleteData, editData, getAllData, getData } from "./db";
+import {
+	addData,
+	deleteAllData,
+	deleteData,
+	editData,
+	getAllData,
+	getData,
+	importData,
+} from "./db";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import fs from "fs/promises";
 import { hash, randomUUID } from "crypto";
-import { StudentType, TeacherType, bulan } from "./data";
-import path, { dirname } from "path";
+import {
+	OldStudentType,
+	OldTeacherType,
+	StudentType,
+	TeacherType,
+	bulan,
+} from "./data";
+import { writeBatch } from "firebase/firestore";
 
 export async function getAllTeachers() {
 	const teachers: TeacherType[] = await getAllData("teachers");
@@ -25,6 +39,20 @@ export async function getTeacher(id: string) {
 export async function getStudent(id: string) {
 	const student: StudentType = await getData("students", id);
 	return student;
+}
+
+export async function searchStudent(keywords: string) {
+	const students: StudentType[] = await getAllData("students");
+	return students.filter((student) => {
+		return student.nama?.toLowerCase().includes(keywords.toLowerCase());
+	});
+}
+
+export async function searchTeacher(keywords: string) {
+	const teachers: TeacherType[] = await getAllData("teachers");
+	return teachers.filter((teacher) => {
+		return teacher.nama?.toLowerCase().includes(keywords.toLowerCase());
+	});
 }
 
 export async function addTeacher(formData: FormData) {
@@ -60,9 +88,10 @@ export async function addTeacher(formData: FormData) {
 export async function deleteTeacher(id: string) {
 	const teacher = await getData("teachers", id);
 
-	fs.rm(`${process.cwd()}/public/img/teachers/${teacher.image}.png`, {
-		force: true,
-	});
+	if (teacher.image != "")
+		await fs.rm(`${process.cwd()}/public/img/teachers/${teacher.image}`, {
+			force: true,
+		});
 	await deleteData("teachers", id);
 
 	revalidatePath("/dashboard/teachers");
@@ -110,7 +139,9 @@ export async function addStudent(formData: FormData) {
 	const data = {
 		nama: formData.get("nama"),
 		kelas: formData.get("kelas"),
-		tanggalLahir: new Date(newDate).toUTCString(),
+		tanggalLahir: formData.get("tanggalLahir")
+			? new Date(newDate).toUTCString()
+			: "",
 		kesan: formData.get("kesan"),
 		pesan: formData.get("pesan"),
 		image: "",
@@ -137,11 +168,12 @@ export async function addStudent(formData: FormData) {
 }
 
 export async function deleteStudent(id: string) {
-	const teacher = await getData("students", id);
+	const student: StudentType = await getData("students", id);
 
-	fs.rm(`${process.cwd()}/public/img/students/${teacher.image}.png`, {
-		force: true,
-	});
+	if (student.image)
+		fs.rm(`${process.cwd()}/public/img/students/${student.image}.png`, {
+			force: true,
+		});
 	await deleteData("students", id);
 
 	revalidatePath("/dashboard/students");
@@ -187,4 +219,115 @@ export async function editStudent(id: string, formData: FormData) {
 
 	revalidatePath("/dashboard/students");
 	redirect("/dashboard/students");
+}
+
+export async function importTeachersData() {
+	let teachers = JSON.parse(
+		await fs.readFile(
+			"C:/Users/user/Documents/aksana-29/public/data/guru.json",
+			{
+				encoding: "utf-8",
+			},
+		),
+	) as OldTeacherType[];
+
+	const batchTeacher: TeacherType[] = [];
+	teachers.forEach(async (teacher: OldTeacherType) => {
+		let data = {
+			id: randomUUID(),
+			nama: teacher.nama,
+			mapel: "",
+			jabatan: teacher.jabatan,
+			image: "",
+			date: Date.now().toString(),
+		};
+
+		if (teacher.mapel) {
+			if (typeof teacher.mapel == "string") {
+				data.mapel = teacher.mapel;
+			} else {
+				data.mapel = teacher.mapel.join(", ");
+			}
+		}
+
+		const extension = teacher.image?.split(".").at(-1);
+		data.image = randomUUID() + "." + extension;
+
+		fs.copyFile(
+			`C:/Users/user/Documents/aksana-29/public/img/guru/${teacher.image}`,
+			`C:/Users/user/Documents/nextjs-project/public/img/teachers/${data.image}`,
+		);
+
+		batchTeacher.push(data);
+	});
+
+	await importData("teachers", batchTeacher);
+
+	revalidatePath("/dashboard/teachers");
+}
+
+export async function deleteAllTeachers() {
+	const teachers = await getAllTeachers();
+	teachers.forEach(async (item) => {
+		if (item.image != "")
+			fs.rm(`${process.cwd()}/public/img/teachers/${item.image}`, {
+				force: true,
+			});
+	});
+	await deleteAllData("teachers");
+	revalidatePath("/dashboard/teachers");
+}
+
+export async function importStudentsData() {
+	let students = JSON.parse(
+		await fs.readFile(
+			"C:/Users/user/Documents/aksana-29/public/data/siswa.json",
+			{
+				encoding: "utf-8",
+			},
+		),
+	) as OldStudentType[];
+
+	const batchStudents: StudentType[] = [];
+	students.forEach(async (student: OldStudentType) => {
+		const [date, month, year] = student.ttl?.toString().split("-") || [];
+		const newDate = `${year}-${month}-${date}`;
+
+		let data = {
+			id: randomUUID(),
+			nama: student.nama,
+			kelas: student.kelas,
+			image: "",
+			tanggalLahir: new Date(newDate).toUTCString(),
+			kesan: student.kesan,
+			pesan: student.pesan,
+			date: Date.now().toString(),
+		};
+
+		const extension = student.image?.split(".").at(-1);
+		data.image = randomUUID() + "." + extension;
+
+		fs.copyFile(
+			`C:/Users/user/Documents/aksana-29/public/img/pesdik/${student.image}`,
+			`C:/Users/user/Documents/nextjs-project/public/img/students/${data.image}`,
+		);
+
+		batchStudents.push(data);
+	});
+
+	await importData("students", batchStudents);
+
+	revalidatePath("/dashboard/students");
+}
+
+export async function deleteAllStudents() {
+	const students = await getAllStudents();
+	students.forEach(async (item) => {
+		if (item.image != "")
+			fs.rm(`${process.cwd()}/public/img/students/${item.image}`, {
+				force: true,
+			});
+	});
+	await deleteAllData("students");
+	revalidatePath("/dashboard/students");
 }

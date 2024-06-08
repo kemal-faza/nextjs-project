@@ -10,7 +10,10 @@ export default function StudentEditForm({ student }: { student: StudentType }) {
 	const [image, setImage] = useState("");
 	const [createObjectURL, setCreateObjectURL] = useState("");
 	const [show, setShow] = useState(false);
-	const tanggalLahir = new Date(student.tanggalLahir as string);
+	const tanggalLahir =
+		student.tanggalLahir != ""
+			? new Date(student.tanggalLahir as string)
+			: null;
 
 	function handleImageChange(e: any) {
 		const file = e.target.files[0];

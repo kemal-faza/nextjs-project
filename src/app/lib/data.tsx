@@ -84,3 +84,19 @@ export const bulan: any = {
 	November: "11",
 	Desember: "12",
 };
+
+export type OldStudentType = {
+	nama?: string;
+	kelas?: string;
+	ttl?: string;
+	kesan?: string;
+	pesan?: string;
+	image?: string;
+};
+export type OldTeacherType = {
+	nama?: string;
+	jabatan?: string;
+	mapel?: string[];
+	ekstra?: string;
+	image?: string;
+};

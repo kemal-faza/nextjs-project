@@ -1,5 +1,5 @@
 import { Inter } from "next/font/google";
-import "@/app/globals.css";
+// import "@/app/globals.css";
 import Script from "next/script";
 import Sidebar from "@/components/dashboard/Sidebar";
 
@@ -15,6 +15,7 @@ export default function RootLayout({
 			<body className={inter.className}>
 				<Sidebar>{children}</Sidebar>
 				<Script src="/script/flowbite.min.js"></Script>
+				<Script src="/script/datepicker.min.js"></Script>
 			</body>
 		</html>
 	);
