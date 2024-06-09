@@ -112,8 +112,8 @@ export default async function TeachersPage({
 										</td>
 										<td className="px-6 py-4">
 											<Image
-												width={100}
-												height={100}
+												width={1000}
+												height={1000}
 												src={
 													teacher.image
 														? `/img/teachers/${teacher.image}`
