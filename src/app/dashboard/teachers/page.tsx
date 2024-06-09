@@ -1,4 +1,8 @@
-import { getAllTeachers, importTeachersData } from "@/app/lib/action";
+import {
+	getAllTeachers,
+	importTeachersData,
+	searchTeacher,
+} from "@/app/lib/action";
 import { TeacherType } from "@/app/lib/data";
 import DeleteTeacherButton from "@/components/dashboard/teachers/DeleteButton";
 import ImportButton from "@/components/dashboard/ImportButton";
@@ -8,15 +12,23 @@ import Link from "next/link";
 import DeleteAllDataButton from "@/components/dashboard/DeleteAllDataButton";
 import { getAllData } from "@/app/lib/db";
 import SearchBar from "@/components/dashboard/SearchBar";
+import SearchBarSkeleton from "@/components/dashboard/skeletons/SearchBar";
+import { Suspense } from "react";
 
 export const metadata = {
 	title: "Teachers",
 };
 
-export default async function TeachersPage() {
-	const teachers = (await getAllData("teachers")).sort((a, b) => {
-		return Number(b.date) - Number(a.date);
-	});
+export default async function TeachersPage({
+	searchParams,
+}: {
+	searchParams: { search: string; page: string };
+}) {
+	const teachers = (await searchTeacher(searchParams.search || "")).sort(
+		(a, b) => {
+			return Number(b.date) - Number(a.date);
+		},
+	);
 
 	return (
 		<>
@@ -34,7 +46,13 @@ export default async function TeachersPage() {
 				</div>
 			</div>
 
-			<SearchBar />
+			<Suspense fallback={<SearchBarSkeleton />}>
+				<div className="flex justify-between items-center mb-4">
+					<SearchBar />
+					<p>Total : {teachers.length} Data</p>
+				</div>
+			</Suspense>
+
 			<div className="relative overflow-x-auto shadow-md sm:rounded-lg">
 				<table className="w-full text-sm text-center rtl:text-right text-gray-400">
 					<thead className="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">

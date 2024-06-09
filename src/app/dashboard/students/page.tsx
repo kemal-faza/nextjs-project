@@ -8,8 +8,8 @@ import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import SearchBar from "@/components/dashboard/SearchBar";
-import { getPaginateData, getTotalPage } from "@/app/lib/db";
-import Pagination from "@/components/dashboard/Pagination";
+import { Suspense } from "react";
+import SearchBarSkeleton from "@/components/dashboard/skeletons/SearchBar";
 
 export const metadata: Metadata = {
 	title: "Students",
@@ -20,16 +20,14 @@ export default async function StudentsPage({
 }: {
 	searchParams: { search: string; page: string };
 }) {
-	const totalPage = await getTotalPage("students");
-	const students = await getPaginateData("students");
-	// const students = (await searchStudent(searchParams.search || "")).sort(
-	// 	(a, b) => {
-	// 		// return searchParams.search && searchParams.search != ""
-	// 		// 	? (a.kelas > b.kelas) - (a.kelas < b.kelas)
-	// 		// 	: Number(b.date) - Number(a.date);
-	// 		return Number(b.date) - Number(a.date);
-	// 	},
-	// );
+	const students = (await searchStudent(searchParams.search || "")).sort(
+		(a, b) => {
+			// return searchParams.search && searchParams.search != ""
+			// 	? (a.kelas > b.kelas) - (a.kelas < b.kelas)
+			// 	: Number(b.date) - Number(a.date);
+			return Number(b.date) - Number(a.date);
+		},
+	);
 
 	return (
 		<>
@@ -47,10 +45,12 @@ export default async function StudentsPage({
 				</div>
 			</div>
 
-			<div className="flex justify-between items-center mb-4">
-				<SearchBar />
-				<p>Total : {students.length} Data</p>
-			</div>
+			<Suspense fallback={<SearchBarSkeleton />}>
+				<div className="flex justify-between items-center mb-4">
+					<SearchBar />
+					<p>Total : {students.length} Data</p>
+				</div>
+			</Suspense>
 
 			<div className="relative overflow-x-auto shadow-md sm:rounded-lg">
 				<table className="w-full text-sm rtl:text-right text-gray-400 text-center">
@@ -90,7 +90,7 @@ export default async function StudentsPage({
 					</thead>
 					<tbody>
 						{students.length > 0 ? (
-							students.map(
+							students?.map(
 								(student: StudentType, index: number) => {
 									const tanggalLahir =
 										student.tanggalLahir != ""
@@ -183,10 +183,6 @@ export default async function StudentsPage({
 						)}
 					</tbody>
 				</table>
-			</div>
-
-			<div className="flex justify-center mt-5">
-				<Pagination />
 			</div>
 		</>
 	);

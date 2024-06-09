@@ -8,11 +8,11 @@ import {
 	orderBy,
 	query,
 	setDoc,
+	where,
 	writeBatch,
 } from "firebase/firestore";
 import app from "./firebase";
 import { collection, getDocs } from "firebase/firestore";
-import { StudentType } from "./data";
 
 const db = getFirestore(app);
 
@@ -81,30 +81,4 @@ export async function deleteAllData(collectionName: "students" | "teachers") {
 		batch.delete(data);
 	});
 	await batch.commit();
-}
-
-const ITEMS_PER_PAGE = 10;
-export async function getPaginateData(collectionName: "students" | "teachers") {
-	const firstDocs = (
-		await getDocs(
-			query(
-				collection(db, collectionName),
-				orderBy("date", "asc"),
-				limit(ITEMS_PER_PAGE),
-			),
-		)
-	).docs;
-	const data: any[] = firstDocs.map((doc) => {
-		return {
-			id: doc.id,
-			...doc.data(),
-		};
-	});
-	return data;
-}
-
-export async function getTotalPage(collectionName: "students" | "teachers") {
-	const data = await getAllData(collectionName);
-	const totalPage = Math.ceil(data.length / 10);
-	return totalPage;
 }
